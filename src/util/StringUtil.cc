@@ -28,9 +28,10 @@ static int __htoi(unsigned char *s)
 	int c;
 
 	c = s[0];
-	if (isupper(c))
-		c = tolower(c);
-
+	if (isupper(c)) {
+        c = tolower(c);
+    }
+	
 	value = (c >= '0' && c <= '9' ? c - '0' : c - 'a' + 10) * 16;
 
 	c = s[1];
