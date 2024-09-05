@@ -1,22 +1,28 @@
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build.cmake/bin)
-
-find_library(LIBRT rt)
-
 find_package(OpenSSL REQUIRED)
 
-find_package(workflow REQUIRED CONFIG HINTS ..)
+#find_package(workflow REQUIRED CONFIG HINTS ..)
 
-include_directories(${OPENSSL_INCLUDE_DIR} ${WORKFLOW_INCLUDE_DIR})
-link_directories(${WORKFLOW_LIB_DIR})
+include_directories(
+    /home/zhchen/github/workflow/src/client/include
+    /home/zhchen/github/workflow/src/factory/include
+    /home/zhchen/github/workflow/src/kernel/include
+    /home/zhchen/github/workflow/src/manager/include
+    /home/zhchen/github/workflow/src/nameservice/include
+    /home/zhchen/github/workflow/src/protocol/include
+    /home/zhchen/github/workflow/src/server/include
+    /home/zhchen/github/workflow/src/util/include
+)
+
+# link_directories(${WORKFLOW_LIB_DIR})
 
 # if (KAFKA STREQUAL "y")
 # 	find_path(SNAPPY_INCLUDE_PATH NAMES snappy.h)
 # 	include_directories(${SNAPPY_INCLUDE_PATH})
 # endif ()
 
-set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wall -fPIC -pipe -std=gnu90")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -pipe -std=c++11 -fno-exceptions")
+# set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wall -fPIC -pipe -std=gnu90")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -pipe -std=c++11 -fno-exceptions")
 
 set(TUTORIAL_LIST
 	# tutorial-00-helloworld
@@ -32,14 +38,33 @@ set(TUTORIAL_LIST
 	# tutorial-17-dns_cli
 )
 
-set(WORKFLOW_LIB workflow pthread OpenSSL::SSL OpenSSL::Crypto ${LIBRT})
+#set(WORKFLOW_LIB workflow pthread OpenSSL::SSL OpenSSL::Crypto ${LIBRT})
 
-foreach(src ${TUTORIAL_LIST})
-	string(REPLACE "-" ";" arr ${src})
-	list(GET arr -1 bin_name)
-	add_executable(${bin_name} ${src}.cc)
-	target_link_libraries(${bin_name} ${WORKFLOW_LIB})
-endforeach()
+add_executable(http_echo_server
+    tutorial-04-http_echo_server.cc
+)
+
+target_link_libraries(
+    http_echo_server
+    kernel
+	util
+	manager
+	protocol
+	factory
+	nameservice
+	server
+	client
+    OpenSSL::SSL
+    OpenSSL::Crypto
+    pthread
+)
+
+# foreach(src ${TUTORIAL_LIST})
+# 	string(REPLACE "-" ";" arr ${src})
+# 	list(GET arr -1 bin_name)
+# 	add_executable(${bin_name} ${src}.cc)
+# 	target_link_libraries(${bin_name} ${WORKFLOW_LIB})
+# endforeach()
 
 # if (NOT REDIS STREQUAL "n")
 # set(TUTORIAL_LIST

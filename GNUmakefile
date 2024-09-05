@@ -38,8 +38,8 @@ clean:
 	-make -C test clean
 	-make -C tutorial clean
 	rm -rf $(DEFAULT_BUILD_DIR)
-	rm -rf _include
-	rm -rf _lib
+	rm -rf include
+	rm -rf lib
 	find . -name CMakeCache.txt | xargs rm -f
 	find . -name Makefile       | xargs rm -f
 	find . -name "*.cmake"      | xargs rm -f

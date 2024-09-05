@@ -25,11 +25,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
-#include "workflow/HttpMessage.h"
-#include "workflow/HttpUtil.h"
-#include "workflow/WFServer.h"
-#include "workflow/WFHttpServer.h"
-#include "workflow/WFFacilities.h"
+#include "HttpMessage.h"
+#include "HttpUtil.h"
+#include "WFServer.h"
+#include "WFHttpServer.h"
+#include "WFFacilities.h"
 
 void process(WFHttpTask* server_task)
 {

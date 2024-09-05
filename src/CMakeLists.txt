@@ -1,8 +1,7 @@
-cmake_minimum_required(VERSION 3.6)
 
 find_package(OpenSSL REQUIRED)
 
-include_directories(${OPENSSL_INCLUDE_DIR} ${INC_DIR}/workflow)
+include_directories(${OPENSSL_INCLUDE_DIR})
 
 if (KAFKA STREQUAL "y")
 	find_path(SNAPPY_INCLUDE_PATH NAMES snappy.h)
@@ -22,14 +21,14 @@ add_subdirectory(nameservice)
 add_subdirectory(server)
 add_subdirectory(client)
 
-add_dependencies(kernel LINK_HEADERS)
-add_dependencies(util LINK_HEADERS)
-add_dependencies(manager LINK_HEADERS)
-add_dependencies(protocol LINK_HEADERS)
-add_dependencies(factory LINK_HEADERS)
-add_dependencies(nameservice LINK_HEADERS)
-add_dependencies(server LINK_HEADERS)
-add_dependencies(client LINK_HEADERS)
+# add_dependencies(kernel LINK_HEADERS)
+# add_dependencies(util LINK_HEADERS)
+# add_dependencies(manager LINK_HEADERS)
+# add_dependencies(protocol LINK_HEADERS)
+# add_dependencies(factory LINK_HEADERS)
+# add_dependencies(nameservice LINK_HEADERS)
+# add_dependencies(server LINK_HEADERS)
+# add_dependencies(client LINK_HEADERS)
 
 set(STATIC_LIB_NAME ${PROJECT_NAME}-static)
 set(SHARED_LIB_NAME ${PROJECT_NAME}-shared)
