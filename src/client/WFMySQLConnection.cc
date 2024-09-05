@@ -29,10 +29,8 @@ int WFMySQLConnection::init(const std::string& url, SSL_CTX *ssl_ctx)
 	std::string query;
 	ParsedURI uri;
 
-	if (URIParser::parse(url, uri) >= 0)
-	{
-		if (uri.query)
-		{
+	if (URIParser::parse(url, uri) >= 0) {
+		if (uri.query) {
 			query = uri.query;
 			query += '&';
 		}
@@ -40,8 +38,7 @@ int WFMySQLConnection::init(const std::string& url, SSL_CTX *ssl_ctx)
 		query += "transaction=INTERNAL_CONN_ID_" + std::to_string(this->id);
 		free(uri.query);
 		uri.query = strdup(query.c_str());
-		if (uri.query)
-		{
+		if (uri.query) {
 			this->uri = std::move(uri);
 			this->ssl_ctx = ssl_ctx;
 			return 0;

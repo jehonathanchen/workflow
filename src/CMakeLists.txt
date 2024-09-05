@@ -1,11 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 
-if(ANDROID)
-	include_directories(${OPENSSL_INCLUDE_DIR})
-	link_directories(${OPENSSL_LINK_DIR})
-else()
-	find_package(OpenSSL REQUIRED)
-endif ()
+find_package(OpenSSL REQUIRED)
 
 include_directories(${OPENSSL_INCLUDE_DIR} ${INC_DIR}/workflow)
 
@@ -63,13 +58,8 @@ add_library(
 	$<TARGET_OBJECTS:client>
 )
 
-if(ANDROID)
-	target_link_libraries(${SHARED_LIB_NAME} ssl crypto c)
-	target_link_libraries(${STATIC_LIB_NAME} ssl crypto c)
-else()
-	target_link_libraries(${SHARED_LIB_NAME} OpenSSL::SSL OpenSSL::Crypto pthread)
-	target_link_libraries(${STATIC_LIB_NAME} OpenSSL::SSL OpenSSL::Crypto pthread)
-endif ()
+target_link_libraries(${SHARED_LIB_NAME} OpenSSL::SSL OpenSSL::Crypto pthread)
+target_link_libraries(${STATIC_LIB_NAME} OpenSSL::SSL OpenSSL::Crypto pthread)
 
 set_target_properties(${STATIC_LIB_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 set_target_properties(${SHARED_LIB_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME} VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
@@ -98,12 +88,7 @@ if (KAFKA STREQUAL "y")
 		$<TARGET_OBJECTS:protocol_kafka>
 		$<TARGET_OBJECTS:factory_kafka>
 	)
-	if (APPLE)
-		target_link_libraries(${KAFKA_SHARED_LIB_NAME}
-							  ${SHARED_LIB_NAME} z lz4 zstd ${SNAPPY_LIB})
-	else ()
-		target_link_libraries(${KAFKA_SHARED_LIB_NAME} ${SHARED_LIB_NAME})
-	endif ()
+    target_link_libraries(${KAFKA_SHARED_LIB_NAME} ${SHARED_LIB_NAME})
 	set_target_properties(${KAFKA_SHARED_LIB_NAME} PROPERTIES OUTPUT_NAME "wfkafka" VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
 endif ()
 
@@ -136,9 +121,10 @@ target_include_directories(${STATIC_LIB_NAME} BEFORE PUBLIC
 	"$<BUILD_INTERFACE:${INC_DIR}>"
 	"$<INSTALL_INTERFACE:${INC_DIR}>")
 target_include_directories(${SHARED_LIB_NAME} BEFORE PUBLIC
-	"$<BUILD_INTERFACE:${INC_DIR}>"
+	"$<BUILD_INTERFACE:${INC_DIR}>"    
 	"$<INSTALL_INTERFACE:${INC_DIR}>")
-if (KAFKA STREQUAL "y")
+
+    if (KAFKA STREQUAL "y")
 	target_include_directories(${KAFKA_STATIC_LIB_NAME} BEFORE PUBLIC
 		"$<BUILD_INTERFACE:${INC_DIR}>"
 		"$<INSTALL_INTERFACE:${INC_DIR}>")

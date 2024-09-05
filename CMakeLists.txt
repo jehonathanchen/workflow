@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 
-set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "build type")
+set(CMAKE_BUILD_TYPE CACHE STRING "build type")
 set(CMAKE_SKIP_RPATH TRUE)
 
 project(
@@ -9,20 +9,16 @@ project(
 	LANGUAGES C CXX
 )
 
-if (CYGWIN)
-	message(FATAL_ERROR "Sorry, DO NOT support Cygwin")
-endif ()
-
-if (MINGW)
-	message(FATAL_ERROR "Sorry, DO NOT support MinGW")
-endif ()
-
 include(GNUInstallDirs)
 
 set(CMAKE_CONFIG_INSTALL_FILE ${PROJECT_BINARY_DIR}/config.toinstall.cmake)
 set(CMAKE_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+
 set(INC_DIR ${PROJECT_SOURCE_DIR}/_include CACHE PATH "workflow inc")
+
 set(LIB_DIR ${PROJECT_SOURCE_DIR}/_lib CACHE PATH "workflow lib")
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/build.cmake/bin)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LIB_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LIB_DIR})
@@ -53,26 +49,18 @@ foreach(header_file ${INCLUDE_HEADERS} ${INCLUDE_KERNEL_HEADERS})
 	makeLink(${PROJECT_SOURCE_DIR}/${header_file} ${INC_DIR}/${PROJECT_NAME}/${file_name} LINK_HEADERS)
 endforeach()
 
-message("CMAKE_C_FLAGS_DEBUG is ${CMAKE_C_FLAGS_DEBUG}")
-message("CMAKE_C_FLAGS_RELEASE is ${CMAKE_C_FLAGS_RELEASE}")
-message("CMAKE_C_FLAGS_RELWITHDEBINFO is ${CMAKE_C_FLAGS_RELWITHDEBINFO}")
-message("CMAKE_C_FLAGS_MINSIZEREL is ${CMAKE_C_FLAGS_MINSIZEREL}")
+# message("CMAKE_C_FLAGS_DEBUG is ${CMAKE_C_FLAGS_DEBUG}")
+# message("CMAKE_C_FLAGS_RELEASE is ${CMAKE_C_FLAGS_RELEASE}")
+# message("CMAKE_C_FLAGS_RELWITHDEBINFO is ${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+# message("CMAKE_C_FLAGS_MINSIZEREL is ${CMAKE_C_FLAGS_MINSIZEREL}")
 
-message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
-message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
-message("CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-message("CMAKE_CXX_FLAGS_MINSIZEREL is ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+# message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
+# message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
+# message("CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+# message("CMAKE_CXX_FLAGS_MINSIZEREL is ${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
-if (WIN32)
-	set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   /MP /wd4200")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /wd4200 /std:c++14")
-else ()
-	set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wall -fPIC -pipe -std=gnu90")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -pipe -std=c++11 -fno-exceptions -Wno-invalid-offsetof")
-	if (APPLE)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
-	endif()
-endif ()
+set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wall -fPIC -pipe -std=gnu90")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -pipe -std=c++11 -fno-exceptions -Wno-invalid-offsetof")
 
 add_subdirectory(src)
 
@@ -90,6 +78,7 @@ configure_package_config_file(
 
 set(CONFIG_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR})
 set(CONFIG_LIB_DIR ${CMAKE_INSTALL_LIBDIR})
+
 configure_package_config_file(
 	${PROJECT_NAME}-config.cmake.in
 	${CMAKE_CONFIG_INSTALL_FILE}
@@ -127,3 +116,5 @@ install(
 	DESTINATION "${CMAKE_INSTALL_DOCDIR}-${PROJECT_VERSION}"
 	COMPONENT devel
 )
+
+add_subdirectory(tutorial)

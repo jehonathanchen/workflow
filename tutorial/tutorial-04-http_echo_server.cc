@@ -31,10 +31,10 @@
 #include "workflow/WFHttpServer.h"
 #include "workflow/WFFacilities.h"
 
-void process(WFHttpTask *server_task)
+void process(WFHttpTask* server_task)
 {
-	protocol::HttpRequest *req = server_task->get_req();
-	protocol::HttpResponse *resp = server_task->get_resp();
+	protocol::HttpRequest*  req = server_task->get_req();
+	protocol::HttpResponse* resp = server_task->get_resp();
 	long long seq = server_task->get_task_seq();
 	protocol::HttpHeaderCursor cursor(req);
 	std::string name;
@@ -48,8 +48,7 @@ void process(WFHttpTask *server_task)
 				   req->get_request_uri(), req->get_http_version());
 	resp->append_output_body(buf, len);
 
-	while (cursor.next(name, value))
-	{
+	while (cursor.next(name, value)) {
 		len = snprintf(buf, 8192, "<p>%s: %s</p>", name.c_str(), value.c_str());
 		resp->append_output_body(buf, len);
 	}
@@ -94,17 +93,14 @@ void process(WFHttpTask *server_task)
 
 static WFFacilities::WaitGroup wait_group(1);
 
-void sig_handler(int signo)
-{
+void sig_handler(int signo) {
 	wait_group.done();
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	unsigned short port;
 
-	if (argc != 2)
-	{
+	if (argc != 2) {
 		fprintf(stderr, "USAGE: %s <port>\n", argv[0]);
 		exit(1);
 	}
@@ -113,13 +109,11 @@ int main(int argc, char *argv[])
 
 	WFHttpServer server(process);
 	port = atoi(argv[1]);
-	if (server.start(port) == 0)
-	{
+	if (server.start(port) == 0) {
 		wait_group.wait();
 		server.stop();
 	}
-	else
-	{
+	else {
 		perror("Cannot start server");
 		exit(1);
 	}

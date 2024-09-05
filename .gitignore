@@ -45,5 +45,5 @@ workflow-config.cmake
 
 # xmake configs
 .xmake
-build.xmake
+build.cmake
 _include

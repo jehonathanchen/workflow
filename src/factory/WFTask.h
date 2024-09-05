@@ -65,8 +65,8 @@ public:
 	}
 
 public:
-	INPUT *get_input() { return &this->input; }
-	OUTPUT *get_output() { return &this->output; }
+	INPUT* get_input() { return &this->input; }
+	OUTPUT* get_output() { return &this->output; }
 
 public:
 	void *user_data;
