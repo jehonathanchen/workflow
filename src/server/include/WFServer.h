@@ -209,13 +209,13 @@ public:
 	WFServer(const struct WFServerParams *params,
 			 std::function<void (WFNetworkTask<REQ, RESP> *)> proc) :
 		WFServerBase(params),
-		process(std::move(proc))
+		_process(std::move(proc))
 	{
 	}
 
 	WFServer(std::function<void (WFNetworkTask<REQ, RESP> *)> proc) :
 		WFServerBase(&SERVER_PARAMS_DEFAULT),
-		process(std::move(proc))
+		_process(std::move(proc))
 	{
 	}
 
@@ -223,7 +223,7 @@ protected:
 	virtual CommSession *new_session(long long seq, CommConnection *conn);
 
 protected:
-	std::function<void (WFNetworkTask<REQ, RESP> *)> process;
+	std::function<void (WFNetworkTask<REQ, RESP> *)> _process;
 };
 
 template<class REQ, class RESP>

@@ -41,7 +41,7 @@ static constexpr struct WFServerParams REDIS_SERVER_PARAMS_DEFAULT =
 template<> inline
 WFRedisServer::WFServer(redis_process_t proc) :
 	WFServerBase(&REDIS_SERVER_PARAMS_DEFAULT),
-	process(std::move(proc))
+	_process(std::move(proc))
 {
 }
 

@@ -41,7 +41,7 @@ static constexpr struct WFServerParams DNS_SERVER_PARAMS_DEFAULT =
 template<> inline
 WFDnsServer::WFServer(dns_process_t proc) :
 	WFServerBase(&DNS_SERVER_PARAMS_DEFAULT),
-	process(std::move(proc))
+	_process(std::move(proc))
 {
 }
 
@@ -50,7 +50,7 @@ CommSession *WFDnsServer::new_session(long long seq, CommConnection *conn)
 {
 	WFDnsTask *task;
 
-	task = WFServerTaskFactory::create_dns_task(this, this->process);
+	task = WFServerTaskFactory::create_dns_task(this, this->_process);
 	task->set_keep_alive(this->_params.keep_alive_timeout);
 	task->set_receive_timeout(this->_params.receive_timeout);
 	task->get_req()->set_size_limit(this->_params.request_size_limit);

@@ -42,7 +42,7 @@ static constexpr struct WFServerParams HTTP_SERVER_PARAMS_DEFAULT =
 template<> inline
 WFHttpServer::WFServer(http_process_t proc) :
 	WFServerBase(&HTTP_SERVER_PARAMS_DEFAULT),
-	process(std::move(proc))
+	_process(std::move(proc))
 {
 }
 
@@ -51,10 +51,10 @@ CommSession *WFHttpServer::new_session(long long seq, CommConnection *conn)
 {
 	WFHttpTask *task;
 
-	task = WFServerTaskFactory::create_http_task(this, this->process);
-	task->set_keep_alive(this->_params.keep_alive_timeout);
-	task->set_receive_timeout(this->_params.receive_timeout);
-	task->get_req()->set_size_limit(this->_params.request_size_limit);
+	task = WFServerTaskFactory::create_http_task(this, _process);
+	task->set_keep_alive(_params.keep_alive_timeout);
+	task->set_receive_timeout(_params.receive_timeout);
+	task->get_req()->set_size_limit(_params.request_size_limit);
 
 	return task;
 }
