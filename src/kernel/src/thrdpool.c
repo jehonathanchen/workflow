@@ -24,13 +24,13 @@
 
 struct __thrdpool
 {
-	msgqueue_t *msgqueue;
+	msgqueue_t* msgqueue;
 	size_t nthreads;
 	size_t stacksize;
 	pthread_t tid;
 	pthread_mutex_t mutex;
 	pthread_key_t key;
-	pthread_cond_t *terminate;
+	pthread_cond_t* terminate;
 };
 
 struct __thrdpool_task_entry
@@ -68,8 +68,8 @@ static void *__thrdpool_routine(void *arg)
 	void *task_context;
 
 	pthread_setspecific(pool->key, pool);
-	while (!pool->terminate)
-	{
+
+    while (!pool->terminate) {
 		entry = (struct __thrdpool_task_entry *)msgqueue_get(pool->msgqueue);
 		if (!entry)
 			break;
@@ -148,16 +148,16 @@ static int __thrdpool_create_threads(size_t nthreads, thrdpool_t *pool)
 
 thrdpool_t *thrdpool_create(size_t nthreads, size_t stacksize)
 {
-	thrdpool_t *pool;
+	thrdpool_t* pool;
 	int ret;
 
 	pool = (thrdpool_t *)malloc(sizeof (thrdpool_t));
-	if (!pool)
-		return NULL;
+	if (!pool) {
+        return NULL;
+    }
 
 	pool->msgqueue = msgqueue_create(0, 0);
-	if (pool->msgqueue)
-	{
+	if (pool->msgqueue) {
 		ret = pthread_mutex_init(&pool->mutex, NULL);
 		if (ret == 0)
 		{
@@ -199,8 +199,7 @@ int thrdpool_schedule(const struct thrdpool_task *task, thrdpool_t *pool)
 {
 	void *buf = malloc(sizeof (struct __thrdpool_task_entry));
 
-	if (buf)
-	{
+	if (buf) {
 		__thrdpool_schedule(task, buf, pool);
 		return 0;
 	}
@@ -222,8 +221,7 @@ int thrdpool_increase(thrdpool_t *pool)
 	int ret;
 
 	ret = pthread_attr_init(&attr);
-	if (ret == 0)
-	{
+	if (ret == 0) {
 		if (pool->stacksize)
 			pthread_attr_setstacksize(&attr, pool->stacksize);
 
@@ -272,8 +270,7 @@ void thrdpool_destroy(void (*pending)(const struct thrdpool_task *),
 	struct __thrdpool_task_entry *entry;
 
 	__thrdpool_terminate(in_pool, pool);
-	while (1)
-	{
+	while (1) {
 		entry = (struct __thrdpool_task_entry *)msgqueue_get(pool->msgqueue);
 		if (!entry)
 			break;

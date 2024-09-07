@@ -26,6 +26,16 @@ class ParallelTask;
 class SubTask
 {
 public:
+    SubTask():
+      _parent(nullptr),
+      _pointer(nullptr)
+    {
+	}
+
+	virtual ~SubTask() { }
+	friend class ParallelTask;
+
+public:
 	virtual void dispatch() = 0;
 
 private:
@@ -35,22 +45,12 @@ protected:
 	void subtask_done();
 
 public:
-	void *get_pointer() const { return this->pointer; }
-	void set_pointer(void *pointer) { this->pointer = pointer; }
+	void* get_pointer() const { return _pointer; }
+	void set_pointer(void* pointer) { _pointer = pointer; }
 
 private:
-	ParallelTask *parent;
-	void *pointer;
-
-public:
-	SubTask()
-	{
-		this->parent = NULL;
-		this->pointer = NULL;
-	}
-
-	virtual ~SubTask() { }
-	friend class ParallelTask;
+	ParallelTask* _parent;
+	void* _pointer;
 };
 
 class ParallelTask : public SubTask

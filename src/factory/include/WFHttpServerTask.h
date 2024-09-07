@@ -16,10 +16,8 @@
   Authors: Xie Han (xiehan@sogou-inc.com)
 */
 
-#ifndef _WFHTTPSERVERTASK_H_
-#define _WFHTTPSERVERTASK_H_
+#pragma once
 
-#include "HttpMessage.h"
 #include "WFTask.h"
 #include "WFGlobal.h"
 
@@ -45,6 +43,3 @@ protected:
 	bool req_has_keep_alive_header_;
 	std::string req_keep_alive_;
 };
-
-#endif
-

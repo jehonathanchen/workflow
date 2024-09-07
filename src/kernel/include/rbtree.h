@@ -106,8 +106,7 @@ struct rb_node
 };
 #pragma pack()
 
-struct rb_root
-{
+struct rb_root {
 	struct rb_node *rb_node;
 };
 

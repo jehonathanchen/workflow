@@ -17,8 +17,7 @@
            Wu Jiaxu (wujiaxu@sogou-inc.com)
 */
 
-#ifndef _WFSERVER_H_
-#define _WFSERVER_H_
+#pragma once
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -58,10 +57,11 @@ class WFServerBase : protected CommService
 public:
 	WFServerBase(const struct WFServerParams *params) :
 		conn_count(0)
+
 	{
-		this->params = *params;
-		this->unbind_finish = false;
-		this->listen_fd = -1;
+	    _params = *params;
+	    _unbind_finish = false;
+	    _listen_fd = -1;
 	}
 
 public:
@@ -152,14 +152,14 @@ public:
 	 * server on a random port (start() with port == 0). */
 	int get_listen_addr(struct sockaddr *addr, socklen_t *addrlen) const
 	{
-		if (this->listen_fd >= 0)
-			return getsockname(this->listen_fd, addr, addrlen);
+		if (_listen_fd >= 0)
+			return getsockname(_listen_fd, addr, addrlen);
 
 		errno = ENOTCONN;
 		return -1;
 	}
 
-	const struct WFServerParams *get_params() const { return &this->params; }
+	const struct WFServerParams *get_params() const { return &this->_params; }
 
 protected:
 	/* Override this function to create the initial SSL CTX of the server */
@@ -177,7 +177,7 @@ protected:
 	static int ssl_ctx_callback(SSL *ssl, int *al, void *arg);
 
 protected:
-	WFServerParams params;
+	WFServerParams _params;
 
 protected:
 	virtual int create_listen_fd();
@@ -193,13 +193,13 @@ protected:
 	std::atomic<size_t> conn_count;
 
 private:
-	int listen_fd;
-	bool unbind_finish;
+	int _listen_fd;
+	bool _unbind_finish;
 
 	std::mutex mutex;
 	std::condition_variable cond;
 
-	class CommScheduler *scheduler;
+	class CommScheduler* _scheduler;
 };
 
 template<class REQ, class RESP>
@@ -233,12 +233,11 @@ CommSession *WFServer<REQ, RESP>::new_session(long long seq, CommConnection *con
 	WFNetworkTask<REQ, RESP> *task;
 
 	task = factory::create_server_task(this, this->process);
-	task->set_keep_alive(this->params.keep_alive_timeout);
-	task->set_receive_timeout(this->params.receive_timeout);
-	task->get_req()->set_size_limit(this->params.request_size_limit);
+	task->set_keep_alive(_params.keep_alive_timeout);
+	task->set_receive_timeout(_params.receive_timeout);
+	task->get_req()->set_size_limit(_params.request_size_limit);
 
 	return task;
 }
 
-#endif
 

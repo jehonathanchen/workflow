@@ -16,8 +16,7 @@
   Author: Xie Han (xiehan@sogou-inc.com)
 */
 
-#ifndef _COMMUNICATOR_H_
-#define _COMMUNICATOR_H_
+#pragma once
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -44,7 +43,7 @@ public:
 
 public:
 	void get_addr(const struct sockaddr **addr, socklen_t *addrlen) const
-	{
+    {
 		*addr = this->addr;
 		*addrlen = this->addrlen;
 	}
@@ -52,8 +51,7 @@ public:
 	int has_idle_conn() const { return !list_empty(&this->idle_list); }
 
 protected:
-	void set_ssl(SSL_CTX *ssl_ctx, int ssl_connect_timeout)
-	{
+	void set_ssl(SSL_CTX *ssl_ctx, int ssl_connect_timeout) {
 		this->ssl_ctx = ssl_ctx;
 		this->ssl_connect_timeout = ssl_connect_timeout;
 	}
@@ -200,13 +198,11 @@ private:
 	virtual void handle_unbound() = 0;
 
 private:
-	virtual int create_listen_fd()
-	{
+	virtual int create_listen_fd() {
 		return socket(this->bind_addr->sa_family, SOCK_STREAM, 0);
 	}
 
-	virtual CommConnection *new_connection(int accept_fd)
-	{
+	virtual CommConnection *new_connection(int accept_fd) {
 		return new CommConnection;
 	}
 
@@ -289,9 +285,9 @@ public:
 	int decrease_handler_thread();
 
 private:
-	struct __mpoller *mpoller;
-	struct __msgqueue *msgqueue;
-	struct __thrdpool *thrdpool;
+	struct __mpoller* mpoller;
+	struct __msgqueue* msgqueue;
+	struct __thrdpool* thrdpool;
 	int stop_flag;
 
 private:
@@ -357,18 +353,18 @@ private:
 	static int append_message(const void *buf, size_t *size,
 							  poller_message_t *msg);
 
-	static poller_message_t *create_request(void *context);
-	static poller_message_t *create_reply(void *context);
+	static poller_message_t* create_request(void *context);
+	static poller_message_t* create_reply(void *context);
 
 	static int recv_request(const void *buf, size_t size,
 							struct CommConnEntry *entry);
 
 	static int partial_written(size_t n, void *context);
 
-	static void *accept(const struct sockaddr *addr, socklen_t addrlen,
+	static void* accept(const struct sockaddr *addr, socklen_t addrlen,
 						int sockfd, void *context);
 
-	static void *recvfrom(const struct sockaddr *addr, socklen_t addrlen,
+	static void* recvfrom(const struct sockaddr *addr, socklen_t addrlen,
 						  const void *buf, size_t size, void *context);
 
 	static void callback(struct poller_result *res, void *context);
@@ -377,5 +373,4 @@ public:
 	virtual ~Communicator() { }
 };
 
-#endif
 

@@ -17,8 +17,7 @@
            Xie Han (xiehan@sogou-inc.com)
 */
 
-#ifndef _WFRESOURCEPOOL_H_
-#define _WFRESOURCEPOOL_H_
+#pragma once
 
 #include <mutex>
 #include "list.h"
@@ -32,8 +31,7 @@ public:
 	void post(void *res);
 
 public:
-	struct Data
-	{
+	struct Data {
 		void *pop() { return this->pool->pop(); }
 		void push(void *res) { this->pool->push(res); }
 
@@ -46,13 +44,11 @@ public:
 	};
 
 protected:
-	virtual void *pop()
-	{
+	virtual void *pop() {
 		return this->data.res[this->data.index++];
 	}
 
-	virtual void push(void *res)
-	{
+	virtual void push(void *res) {
 		this->data.res[--this->data.index] = res;
 	}
 
@@ -67,6 +63,4 @@ public:
 	WFResourcePool(size_t n);
 	virtual ~WFResourcePool() { delete []this->data.res; }
 };
-
-#endif
 

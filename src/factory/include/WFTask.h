@@ -16,8 +16,7 @@
   Author: Xie Han (xiehan@sogou-inc.com)
 */
 
-#ifndef _WFTASK_H_
-#define _WFTASK_H_
+#pragma once
 
 #include <errno.h>
 #include <string.h>
@@ -704,8 +703,8 @@ public:
 	void *user_data;
 
 public:
-	int get_state() const { return this->state; }
-	int get_error() const { return this->error; }
+	int get_state() const { return this->_state; }
+	int get_error() const { return this->_error; }
 
 public:
 	void set_callback(std::function<void (WFGoTask *)> cb)
@@ -733,8 +732,8 @@ public:
 		ExecRequest(queue, executor)
 	{
 		this->user_data = NULL;
-		this->state = WFT_STATE_UNDEFINED;
-		this->error = 0;
+		this->_state = WFT_STATE_UNDEFINED;
+		this->_error = 0;
 	}
 
 protected:
@@ -867,6 +866,4 @@ protected:
 };
 
 #include "WFTask.inl"
-
-#endif
 

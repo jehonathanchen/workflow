@@ -52,9 +52,9 @@ CommSession *WFHttpServer::new_session(long long seq, CommConnection *conn)
 	WFHttpTask *task;
 
 	task = WFServerTaskFactory::create_http_task(this, this->process);
-	task->set_keep_alive(this->params.keep_alive_timeout);
-	task->set_receive_timeout(this->params.receive_timeout);
-	task->get_req()->set_size_limit(this->params.request_size_limit);
+	task->set_keep_alive(this->_params.keep_alive_timeout);
+	task->set_receive_timeout(this->_params.receive_timeout);
+	task->get_req()->set_size_limit(this->_params.request_size_limit);
 
 	return task;
 }

@@ -16,8 +16,7 @@
   Author: Xie Han (xiehan@sogou-inc.com)
 */
 
-#ifndef _WFCONNECTION_H_
-#define _WFCONNECTION_H_
+#pragma once
 
 #include <utility>
 #include <atomic>
@@ -64,6 +63,4 @@ protected:
 			this->deleter(this->context);
 	}
 };
-
-#endif
 

@@ -52,47 +52,45 @@ using ComplexKafkaTask = WFComplexClientTask<KafkaRequest, KafkaResponse, int>;
 class KafkaMember
 {
 public:
-	KafkaMember() : scheme("kafka://"), ref(1)
+	KafkaMember() : _scheme("kafka://"), _ref(1)
 	{
-		this->transport_type = TT_TCP;
-		this->cgroup_status = KAFKA_CGROUP_NONE;
-		this->heartbeat_status = KAFKA_HEARTBEAT_UNINIT;
-		this->meta_doing = false;
-		this->cgroup_outdated = false;
-		this->client_deinit = false;
-		this->heartbeat_series = NULL;
+		_transport_type = TT_TCP;
+        _cgroup_status = KAFKA_CGROUP_NONE;
+        _heartbeat_status = KAFKA_HEARTBEAT_UNINIT;
+        _meta_doing = false;
+        _cgroup_outdated = false;
+        _client_deinit = false;
+        _heartbeat_series = NULL;
 	}
 
-	void incref()
-	{
-		++this->ref;
+	void incref() {
+		++_ref;
 	}
 
-	void decref()
-	{
-		if (--this->ref == 0)
+	void decref() {
+		if (--_ref == 0)
 			delete this;
 	}
 
-	enum TransportType transport_type;
-	std::string scheme;
-	std::vector<std::string> broker_hosts;
-	SSL_CTX *ssl_ctx;
-	KafkaCgroup cgroup;
-	KafkaMetaList meta_list;
-	KafkaBrokerMap broker_map;
-	KafkaConfig config;
-	std::map<std::string, bool> meta_status;
-	std::mutex mutex;
-	char cgroup_status;
-	char heartbeat_status;
-	bool meta_doing;
-	bool cgroup_outdated;
-	bool client_deinit;
-	void *heartbeat_series;
-	size_t cgroup_wait_cnt;
-	size_t meta_wait_cnt;
-	std::atomic<int> ref;
+	enum TransportType _transport_type;
+	std::string _scheme;
+	std::vector<std::string> _broker_hosts;
+	SSL_CTX* _ssl_ctx;
+	KafkaCgroup _cgroup;
+	KafkaMetaList _meta_list;
+	KafkaBrokerMap _broker_map;
+	KafkaConfig _config;
+	std::map<std::string, bool> _meta_status;
+	std::mutex _mutex;
+	char _cgroup_status;
+	char _heartbeat_status;
+	bool _meta_doing;
+	bool _cgroup_outdated;
+	bool _client_deinit;
+	void* _heartbeat_series;
+	size_t _cgroup_wait_cnt;
+	size_t _meta_wait_cnt;
+	std::atomic<int> _ref;
 };
 
 class KafkaClientTask : public WFKafkaTask
@@ -292,7 +290,7 @@ void KafkaClientTask::kafka_rebalance_callback(__WFKafkaTask *task)
 		{
 			__WFKafkaTask *kafka_task;
 			KafkaBroker *coordinator = member->cgroup.get_coordinator();
-			kafka_task = __WFKafkaTaskFactory::create_kafka_task(member->transport_type,
+			kafka_task = __WFKafkaTaskFactory::create_kafka_task(member->_transport_type,
 																 coordinator->get_host(),
 																 coordinator->get_port(),
 																 member->ssl_ctx, "", 0,
@@ -325,7 +323,7 @@ void KafkaClientTask::kafka_rebalance_proc(KafkaMember *member, SeriesWork *seri
 {
 	KafkaBroker *coordinator = member->cgroup.get_coordinator();
 	__WFKafkaTask *task;
-	task = __WFKafkaTaskFactory::create_kafka_task(member->transport_type,
+	task = __WFKafkaTaskFactory::create_kafka_task(member->_transport_type,
 												   coordinator->get_host(),
 												   coordinator->get_port(),
 												   member->ssl_ctx, "", 0,
@@ -390,7 +388,7 @@ void KafkaClientTask::kafka_timer_callback(WFTimerTask *task)
 
 	__WFKafkaTask *kafka_task;
 	KafkaBroker *coordinator = member->cgroup.get_coordinator();
-	kafka_task = __WFKafkaTaskFactory::create_kafka_task(member->transport_type,
+	kafka_task = __WFKafkaTaskFactory::create_kafka_task(member->_transport_type,
 														 coordinator->get_host(),
 														 coordinator->get_port(),
 														 member->ssl_ctx, "", 0,
@@ -469,7 +467,7 @@ void KafkaClientTask::kafka_meta_callback(__WFKafkaTask *task)
 		while ((meta = t->meta_list.get_next()) != NULL)
 			(t->member->meta_status)[meta->get_topic()] = true;
 
-		kafka_merge_broker_list(t->member->scheme,
+		kafka_merge_broker_list(t->member->_scheme,
 								&t->member->broker_hosts,
 								&t->member->broker_map,
 								task->get_resp()->get_broker_list());
@@ -486,7 +484,7 @@ void KafkaClientTask::kafka_meta_callback(__WFKafkaTask *task)
 	}
 
 	t->member->meta_doing = false;
-	max = t->member->meta_wait_cnt;
+	max = t->member->_meta_wait_cnt;
 	char name[64];
 	snprintf(name, 64, "%p.meta", t->member);
 	t->member->mutex.unlock();
@@ -519,7 +517,7 @@ void KafkaClientTask::kafka_cgroup_callback(__WFKafkaTask *task)
 		while ((meta = t->meta_list.get_next()) != NULL)
 			(member->meta_status)[meta->get_topic()] = true;
 
-		kafka_merge_broker_list(member->scheme,
+		kafka_merge_broker_list(member->_scheme,
 								&member->broker_hosts,
 								&member->broker_map,
 								task->get_resp()->get_broker_list());
@@ -530,7 +528,7 @@ void KafkaClientTask::kafka_cgroup_callback(__WFKafkaTask *task)
 		{
 			__WFKafkaTask *kafka_task;
 			KafkaBroker *coordinator = member->cgroup.get_coordinator();
-			kafka_task = __WFKafkaTaskFactory::create_kafka_task(member->transport_type,
+			kafka_task = __WFKafkaTaskFactory::create_kafka_task(member->_transport_type,
 																 coordinator->get_host(),
 																 coordinator->get_port(),
 																 member->ssl_ctx, "", 0,
@@ -692,8 +690,8 @@ void KafkaClientTask::generate_info()
 		this->userinfo = buf;
 	}
 
-	const char *hostport = this->url.c_str() + this->member->scheme.size();
-	this->url = this->member->scheme + this->userinfo + "@" + hostport;
+	const char *hostport = this->url.c_str() + this->member->_scheme.size();
+	this->url = this->member->_scheme + this->userinfo + "@" + hostport;
 	this->info_generated = true;
 }
 
@@ -852,7 +850,7 @@ bool KafkaClientTask::check_meta()
 		this->wait_cgroup = false;
 		cond = WFTaskFactory::create_conditional(name, this, &this->msg);
 		series_of(this)->push_front(cond);
-		member->meta_wait_cnt++;
+		member->_meta_wait_cnt++;
 	}
 	else
 	{
@@ -867,7 +865,7 @@ bool KafkaClientTask::check_meta()
 		task->get_req()->set_meta_list(*uninit_meta_list);
 		series_of(this)->push_front(this);
 		series_of(this)->push_front(task);
-		member->meta_wait_cnt = 0;
+		member->_meta_wait_cnt = 0;
 		member->meta_doing = true;
 	}
 
@@ -887,7 +885,7 @@ int KafkaClientTask::dispatch_locked()
 		return member->cgroup_wait_cnt > 0;
 
 	if (this->check_meta() == false)
-		return member->meta_wait_cnt > 0;
+		return member->_meta_wait_cnt > 0;
 
 	if (arrange_toppar(this->api_type) < 0)
 	{
@@ -922,7 +920,7 @@ int KafkaClientTask::dispatch_locked()
 			auto cb = std::bind(&KafkaClientTask::kafka_move_task_callback, this,
 								std::placeholders::_1);
 			KafkaBroker *broker = get_broker(v.first);
-			task = __WFKafkaTaskFactory::create_kafka_task(member->transport_type,
+			task = __WFKafkaTaskFactory::create_kafka_task(member->_transport_type,
 														   broker->get_host(),
 														   broker->get_port(),
 														   member->ssl_ctx,
@@ -958,7 +956,7 @@ int KafkaClientTask::dispatch_locked()
 			auto cb = std::bind(&KafkaClientTask::kafka_move_task_callback, this,
 								std::placeholders::_1);
 			KafkaBroker *broker = get_broker(v.first);
-			task = __WFKafkaTaskFactory::create_kafka_task(member->transport_type,
+			task = __WFKafkaTaskFactory::create_kafka_task(member->_transport_type,
 														   broker->get_host(),
 														   broker->get_port(),
 														   member->ssl_ctx,
@@ -994,7 +992,7 @@ int KafkaClientTask::dispatch_locked()
 
 		this->result.create(1);
 		coordinator = member->cgroup.get_coordinator();
-		task = __WFKafkaTaskFactory::create_kafka_task(member->transport_type,
+		task = __WFKafkaTaskFactory::create_kafka_task(member->_transport_type,
 													   coordinator->get_host(),
 													   coordinator->get_port(),
 													   member->ssl_ctx,
@@ -1024,7 +1022,7 @@ int KafkaClientTask::dispatch_locked()
 		if (!coordinator->get_host())
 			break;
 
-		task = __WFKafkaTaskFactory::create_kafka_task(member->transport_type,
+		task = __WFKafkaTaskFactory::create_kafka_task(member->_transport_type,
 													   coordinator->get_host(),
 													   coordinator->get_port(),
 													   member->ssl_ctx,
@@ -1056,7 +1054,7 @@ int KafkaClientTask::dispatch_locked()
 			auto cb = std::bind(&KafkaClientTask::kafka_move_task_callback, this,
 								std::placeholders::_1);
 			KafkaBroker *broker = get_broker(v.first);
-			task = __WFKafkaTaskFactory::create_kafka_task(member->transport_type,
+			task = __WFKafkaTaskFactory::create_kafka_task(member->_transport_type,
 														   broker->get_host(),
 														   broker->get_port(),
 														   member->ssl_ctx,
@@ -1632,8 +1630,8 @@ int WFKafkaClient::init(const std::string& broker, SSL_CTX *ssl_ctx)
 	this->member->ssl_ctx = ssl_ctx;
 	if (use_ssl)
 	{
-		this->member->transport_type = TT_TCP_SSL;
-		this->member->scheme = "kafkas://";
+		this->member->_transport_type = TT_TCP_SSL;
+		this->member->_scheme = "kafkas://";
 	}
 
 	return 0;

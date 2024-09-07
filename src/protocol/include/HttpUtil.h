@@ -122,8 +122,8 @@ namespace protocol
 class HttpUtil
 {
 public:
-	static void set_response_status(HttpResponse *resp, int status_code);
-	static std::string decode_chunked_body(const HttpMessage *msg);
+	static void set_response_status(HttpResponse* resp, int status_code);
+	static std::string decode_chunked_body(const HttpMessage* msg);
 };
 
 class HttpHeaderMap

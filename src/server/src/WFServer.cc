@@ -88,16 +88,15 @@ SSL_CTX *WFServerBase::new_ssl_ctx(const char *cert_file, const char *key_file)
 int WFServerBase::init(const struct sockaddr *bind_addr, socklen_t addrlen,
 					   const char *cert_file, const char *key_file)
 {
-	int timeout = this->params.peer_response_timeout;
+	int timeout = this->_params.peer_response_timeout;
 
-	if (this->params.receive_timeout >= 0)
-	{
-		if ((unsigned int)timeout > (unsigned int)this->params.receive_timeout)
-			timeout = this->params.receive_timeout;
+	if (this->_params.receive_timeout >= 0) {
+		if ((unsigned int)timeout > (unsigned int)this->_params.receive_timeout)
+			timeout = this->_params.receive_timeout;
 	}
 
-	if (this->params.transport_type == TT_TCP_SSL ||
-		this->params.transport_type == TT_SCTP_SSL)
+	if (this->_params.transport_type == TT_TCP_SSL ||
+		this->_params.transport_type == TT_SCTP_SSL)
 	{
 		if (!cert_file || !key_file)
 		{
@@ -109,7 +108,7 @@ int WFServerBase::init(const struct sockaddr *bind_addr, socklen_t addrlen,
 	if (this->CommService::init(bind_addr, addrlen, -1, timeout) < 0)
 		return -1;
 
-	if (cert_file && key_file && this->params.transport_type != TT_UDP)
+	if (cert_file && key_file && this->_params.transport_type != TT_UDP)
 	{
 		SSL_CTX *ssl_ctx = this->new_ssl_ctx(cert_file, key_file);
 
@@ -119,24 +118,22 @@ int WFServerBase::init(const struct sockaddr *bind_addr, socklen_t addrlen,
 			return -1;
 		}
 
-		this->set_ssl(ssl_ctx, this->params.ssl_accept_timeout);
+		this->set_ssl(ssl_ctx, this->_params.ssl_accept_timeout);
 	}
 
-	this->scheduler = WFGlobal::get_scheduler();
+	this->_scheduler = WFGlobal::get_scheduler();
 	return 0;
 }
 
 int WFServerBase::create_listen_fd()
 {
-	if (this->listen_fd < 0)
-	{
+	if (this->_listen_fd < 0) {
 		const struct sockaddr *bind_addr;
 		socklen_t addrlen;
 		int type, protocol;
 		int reuse = 1;
 
-		switch (this->params.transport_type)
-		{
+		switch (this->_params.transport_type) {
 		case TT_TCP:
 		case TT_TCP_SSL:
 			type = SOCK_STREAM;
@@ -159,22 +156,22 @@ int WFServerBase::create_listen_fd()
 		}
 
 		this->get_addr(&bind_addr, &addrlen);
-		this->listen_fd = socket(bind_addr->sa_family, type, protocol);
-		if (this->listen_fd >= 0)
+		this->_listen_fd = socket(bind_addr->sa_family, type, protocol);
+		if (this->_listen_fd >= 0)
 		{
-			setsockopt(this->listen_fd, SOL_SOCKET, SO_REUSEADDR,
+			setsockopt(this->_listen_fd, SOL_SOCKET, SO_REUSEADDR,
 					   &reuse, sizeof (int));
 		}
 	}
 	else
-		this->listen_fd = dup(this->listen_fd);
+		this->_listen_fd = dup(this->_listen_fd);
 
-	return this->listen_fd;
+	return this->_listen_fd;
 }
 
 WFConnection *WFServerBase::new_connection(int accept_fd)
 {
-	if (++this->conn_count <= this->params.max_connections ||
+	if (++this->conn_count <= this->_params.max_connections ||
 		this->drain(1) == 1)
 	{
 		int reuse = 1;
@@ -196,7 +193,7 @@ void WFServerBase::delete_connection(WFConnection *conn)
 void WFServerBase::handle_unbound()
 {
 	this->mutex.lock();
-	this->unbind_finish = true;
+	this->_unbind_finish = true;
 	this->cond.notify_one();
 	this->mutex.unlock();
 }
@@ -204,11 +201,10 @@ void WFServerBase::handle_unbound()
 int WFServerBase::start(const struct sockaddr *bind_addr, socklen_t addrlen,
 						const char *cert_file, const char *key_file)
 {
-	SSL_CTX *ssl_ctx;
+	SSL_CTX* ssl_ctx;
 
-	if (this->init(bind_addr, addrlen, cert_file, key_file) >= 0)
-	{
-		if (this->scheduler->bind(this) >= 0)
+	if (this->init(bind_addr, addrlen, cert_file, key_file) >= 0) {
+		if (this->_scheduler->bind(this) >= 0)
 			return 0;
 
 		ssl_ctx = this->get_ssl_ctx();
@@ -217,7 +213,7 @@ int WFServerBase::start(const struct sockaddr *bind_addr, socklen_t addrlen,
 			SSL_CTX_free(ssl_ctx);
 	}
 
-	this->listen_fd = -1;
+	this->_listen_fd = -1;
 	return -1;
 }
 
@@ -260,14 +256,14 @@ int WFServerBase::serve(int listen_fd,
 	if (getsockname(listen_fd, (struct sockaddr *)&ss, &len) < 0)
 		return -1;
 
-	this->listen_fd = listen_fd;
+	this->_listen_fd = listen_fd;
 	return start((struct sockaddr *)&ss, len, cert_file, key_file);
 }
 
 void WFServerBase::shutdown()
 {
-	this->listen_fd = -1;
-	this->scheduler->unbind(this);
+	this->_listen_fd = -1;
+	this->_scheduler->unbind(this);
 }
 
 void WFServerBase::wait_finish()
@@ -275,11 +271,11 @@ void WFServerBase::wait_finish()
 	SSL_CTX *ssl_ctx = this->get_ssl_ctx();
 	std::unique_lock<std::mutex> lock(this->mutex);
 
-	while (!this->unbind_finish)
+	while (!this->_unbind_finish)
 		this->cond.wait(lock);
 
 	this->deinit();
-	this->unbind_finish = false;
+	this->_unbind_finish = false;
 	lock.unlock();
 	if (ssl_ctx)
 		SSL_CTX_free(ssl_ctx);

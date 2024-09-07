@@ -1093,8 +1093,8 @@ void __WFTimedGoTask::handle(int state, int error)
 {
 	if (--this->ref == 3)
 	{
-		this->state = state;
-		this->error = error;
+		this->_state = state;
+		this->_error = error;
 		this->subtask_done();
 	}
 
@@ -1110,13 +1110,13 @@ void __WFTimedGoTask::timer_callback(WFTimerTask *timer)
 	{
 		if (timer->get_state() == WFT_STATE_SUCCESS)
 		{
-			task->state = WFT_STATE_SYS_ERROR;
-			task->error = ETIMEDOUT;
+			task->_state = WFT_STATE_SYS_ERROR;
+			task->_error = ETIMEDOUT;
 		}
 		else
 		{
-			task->state = timer->get_state();
-			task->error = timer->get_error();
+			task->_state = timer->get_state();
+			task->_error = timer->get_error();
 		}
 
 		task->subtask_done();

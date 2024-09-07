@@ -16,8 +16,7 @@
   Author: Xie Han (xiehan@sogou-inc.com)
 */
 
-#ifndef _THRDPOOL_H_
-#define _THRDPOOL_H_
+#pragma once
 
 #include <stddef.h>
 
@@ -46,12 +45,12 @@ extern "C"
  * does not end the task thread. It'll run till the end of task.
  */
 
-thrdpool_t *thrdpool_create(size_t nthreads, size_t stacksize);
-int thrdpool_schedule(const struct thrdpool_task *task, thrdpool_t *pool);
-int thrdpool_in_pool(thrdpool_t *pool);
-int thrdpool_increase(thrdpool_t *pool);
-int thrdpool_decrease(thrdpool_t *pool);
-void thrdpool_exit(thrdpool_t *pool);
+thrdpool_t* thrdpool_create(size_t nthreads, size_t stacksize);
+int thrdpool_schedule(const struct thrdpool_task* task, thrdpool_t* pool);
+int thrdpool_in_pool(thrdpool_t* pool);
+int thrdpool_increase(thrdpool_t* pool);
+int thrdpool_decrease(thrdpool_t* pool);
+void thrdpool_exit(thrdpool_t* pool);
 void thrdpool_destroy(void (*pending)(const struct thrdpool_task *),
 					  thrdpool_t *pool);
 
@@ -59,5 +58,4 @@ void thrdpool_destroy(void (*pending)(const struct thrdpool_task *),
 }
 #endif
 
-#endif
 

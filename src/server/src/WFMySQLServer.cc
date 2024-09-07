@@ -23,8 +23,7 @@ WFConnection *WFMySQLServer::new_connection(int accept_fd)
 {
 	WFConnection *conn = this->WFServer::new_connection(accept_fd);
 
-	if (conn)
-	{
+	if (conn) {
 		protocol::MySQLHandshakeResponse resp;
 		struct iovec vec[8];
 		int count;
@@ -51,9 +50,9 @@ CommSession *WFMySQLServer::new_session(long long seq, CommConnection *conn)
 
 	task = WFServerTaskFactory::create_mysql_task(this, seq ? this->process :
 															  empty);
-	task->set_keep_alive(this->params.keep_alive_timeout);
-	task->set_receive_timeout(this->params.receive_timeout);
-	task->get_req()->set_size_limit(this->params.request_size_limit);
+	task->set_keep_alive(this->_params.keep_alive_timeout);
+	task->set_receive_timeout(this->_params.receive_timeout);
+	task->get_req()->set_size_limit(this->_params.request_size_limit);
 
 	return task;
 }

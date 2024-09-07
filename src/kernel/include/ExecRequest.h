@@ -25,36 +25,34 @@
 class ExecRequest : public SubTask, public ExecSession
 {
 public:
-	ExecRequest(ExecQueue *queue, Executor *executor)
-	{
-		this->executor = executor;
-		this->queue = queue;
+	ExecRequest(ExecQueue *queue, Executor *executor) {
+		_executor = executor;
+		_queue = queue;
 	}
 
-	ExecQueue *get_request_queue() const { return this->queue; }
-	void set_request_queue(ExecQueue *queue) { this->queue = queue; }
+	ExecQueue *get_request_queue() const { return _queue; }
+	void set_request_queue(ExecQueue *queue) { _queue = queue; }
 
 public:
 	virtual void dispatch()
 	{
-		if (this->executor->request(this, this->queue) < 0)
-			this->handle(ES_STATE_ERROR, errno);
+		if (_executor->request(this, this->_queue) < 0)
+			handle(ES_STATE_ERROR, _error);
 	}
 
 protected:
-	int state;
-	int error;
+	int _state;
+	int _error;
 
 protected:
-	ExecQueue *queue;
-	Executor *executor;
+	ExecQueue* _queue;
+	Executor* _executor;
 
 protected:
-	virtual void handle(int state, int error)
-	{
-		this->state = state;
-		this->error = error;
-		this->subtask_done();
+	virtual void handle(int state, int error) {
+		_state = state;
+		_error = error;
+		subtask_done();
 	}
 };
 

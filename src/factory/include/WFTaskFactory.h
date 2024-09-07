@@ -17,8 +17,7 @@
            Wu Jiaxu (wujiaxu@sogou-inc.com)
 */
 
-#ifndef _WFTASKFACTORY_H_
-#define _WFTASKFACTORY_H_
+#pragma once
 
 #include <sys/types.h>
 #include <sys/uio.h>
@@ -56,24 +55,21 @@ using dns_callback_t = std::function<void (WFDnsTask *)>;
 
 // File IO tasks
 
-struct FileIOArgs
-{
+struct FileIOArgs {
 	int fd;
 	void *buf;
 	size_t count;
 	off_t offset;
 };
 
-struct FileVIOArgs
-{
+struct FileVIOArgs {
 	int fd;
 	const struct iovec *iov;
 	int iovcnt;
 	off_t offset;
 };
 
-struct FileSyncArgs
-{
+struct FileSyncArgs {
 	int fd;
 };
 
@@ -488,6 +484,4 @@ public:
 };
 
 #include "WFTaskFactory.inl"
-
-#endif
 

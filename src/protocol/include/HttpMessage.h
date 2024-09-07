@@ -34,18 +34,17 @@
 namespace protocol
 {
 
-struct HttpMessageHeader
-{
-	const void *name;
+struct HttpMessageHeader {
+	const void* name;
 	size_t name_len;
-	const void *value;
+	const void* value;
 	size_t value_len;
 };
 
 class HttpMessage : public ProtocolMessage
 {
 public:
-	const char *get_http_version() const
+	const char* get_http_version() const
 	{
 		return http_parser_get_version(this->parser);
 	}
@@ -133,8 +132,7 @@ public:
 	{
 		const char *str = this->get_http_version();
 
-		if (str)
-		{
+		if (str) {
 			version.assign(str);
 			return true;
 		}
@@ -235,11 +233,9 @@ public:
 		this->cur_size = 0;
 	}
 
-	virtual ~HttpMessage()
-	{
+	virtual ~HttpMessage() {
 		this->clear_output_body();
-		if (this->parser)
-		{
+		if (this->parser) {
 			http_parser_deinit(this->parser);
 			delete this->parser;
 		}
@@ -253,8 +249,7 @@ public:
 class HttpRequest : public HttpMessage
 {
 public:
-	const char *get_method() const
-	{
+	const char *get_method() const {
 		return http_parser_get_method(this->parser);
 	}
 
@@ -279,8 +274,7 @@ public:
 	{
 		const char *str = this->get_method();
 
-		if (str)
-		{
+		if (str) {
 			method.assign(str);
 			return true;
 		}
@@ -288,12 +282,10 @@ public:
 		return false;
 	}
 
-	bool get_request_uri(std::string& uri) const
-	{
+	bool get_request_uri(std::string& uri) const {
 		const char *str = this->get_request_uri();
 
-		if (str)
-		{
+		if (str) {
 			uri.assign(str);
 			return true;
 		}
@@ -350,12 +342,10 @@ public:
 
 	/* std::string interfaces */
 public:
-	bool get_status_code(std::string& code) const
-	{
+	bool get_status_code(std::string& code) const {
 		const char *str = this->get_status_code();
 
-		if (str)
-		{
+		if (str) {
 			code.assign(str);
 			return true;
 		}
@@ -363,12 +353,10 @@ public:
 		return false;
 	}
 
-	bool get_reason_phrase(std::string& phrase) const
-	{
+	bool get_reason_phrase(std::string& phrase) const {
 		const char *str = this->get_reason_phrase();
 
-		if (str)
-		{
+		if (str) {
 			phrase.assign(str);
 			return true;
 		}

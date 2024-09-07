@@ -72,7 +72,7 @@ public:
 	int decrease_thread();
 
 private:
-	struct __thrdpool *thrdpool;
+	struct __thrdpool* thrdpool;
 
 private:
 	static void executor_thread_routine(void *context);

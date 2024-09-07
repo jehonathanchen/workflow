@@ -16,8 +16,7 @@
   Authors: Xie Han (xiehan@sogou-inc.com)
 */
 
-#ifndef _WFMESSAGEQUEUE_H_
-#define _WFMESSAGEQUEUE_H_
+#pragma once
 
 #include <mutex>
 #include "list.h"
@@ -26,13 +25,21 @@
 class WFMessageQueue
 {
 public:
+	WFMessageQueue() {
+		INIT_LIST_HEAD(&this->data.msg_list);
+		INIT_LIST_HEAD(&this->data.wait_list);
+		this->data.queue = this;
+	}
+
+	virtual ~WFMessageQueue() { }
+
+public:
 	WFConditional *get(SubTask *task, void **msgbuf);
 	WFConditional *get(SubTask *task);
 	void post(void *msg);
 
 public:
-	struct Data
-	{
+	struct Data {
 		void *pop() { return this->queue->pop(); }
 		void push(void *msg) { this->queue->push(msg); }
 
@@ -43,15 +50,13 @@ public:
 	};
 
 protected:
-	struct MessageEntry
-	{
+	struct MessageEntry {
 		struct list_head list;
 		void *msg;
 	};
 
 protected:
-	virtual void *pop()
-	{
+	virtual void *pop() {
 		struct MessageEntry *entry;
 		void *msg;
 
@@ -63,26 +68,14 @@ protected:
 		return msg;
 	}
 
-	virtual void push(void *msg)
-	{
+	virtual void push(void *msg) {
 		struct MessageEntry *entry = new struct MessageEntry;
 		entry->msg = msg;
 		list_add_tail(&entry->list, &this->data.msg_list);
 	}
 
-protected:
+private:
 	struct Data data;
-
-public:
-	WFMessageQueue()
-	{
-		INIT_LIST_HEAD(&this->data.msg_list);
-		INIT_LIST_HEAD(&this->data.wait_list);
-		this->data.queue = this;
-	}
-
-	virtual ~WFMessageQueue() { }
 };
 
-#endif
 

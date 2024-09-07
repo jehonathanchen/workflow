@@ -16,8 +16,7 @@
   Author: Xie Han (xiehan@sogou-inc.com)
 */
 
-#ifndef _WFGRAPHTASK_H_
-#define _WFGRAPHTASK_H_
+#pragma once
 
 #include <vector>
 #include <utility>
@@ -102,6 +101,4 @@ public:
 protected:
 	virtual ~WFGraphTask();
 };
-
-#endif
 

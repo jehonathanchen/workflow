@@ -16,8 +16,7 @@
   Author: Xie Han (xiehan@sogou-inc.com)
 */
 
-#ifndef _POLLER_H_
-#define _POLLER_H_
+#pragma once
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -97,7 +96,7 @@ extern "C"
 {
 #endif
 
-poller_t *poller_create(const struct poller_params *params);
+poller_t* poller_create(const struct poller_params *params);
 int poller_start(poller_t *poller);
 int poller_add(const struct poller_data *data, int timeout, poller_t *poller);
 int poller_del(int fd, poller_t *poller);
@@ -111,7 +110,5 @@ void poller_destroy(poller_t *poller);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif
 

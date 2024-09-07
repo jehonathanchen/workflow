@@ -31,8 +31,7 @@
 #include <pthread.h>
 #include "msgqueue.h"
 
-struct __msgqueue
-{
+struct __msgqueue {
 	size_t msg_max;
 	size_t msg_cnt;
 	int linkoff;
@@ -48,8 +47,7 @@ struct __msgqueue
 	pthread_cond_t put_cond;
 };
 
-void msgqueue_set_nonblock(msgqueue_t *queue)
-{
+void msgqueue_set_nonblock(msgqueue_t *queue) {
 	queue->nonblock = 1;
 	pthread_mutex_lock(&queue->put_mutex);
 	pthread_cond_signal(&queue->get_cond);
@@ -57,8 +55,7 @@ void msgqueue_set_nonblock(msgqueue_t *queue)
 	pthread_mutex_unlock(&queue->put_mutex);
 }
 
-void msgqueue_set_block(msgqueue_t *queue)
-{
+void msgqueue_set_block(msgqueue_t *queue) {
 	queue->nonblock = 0;
 }
 
@@ -83,10 +80,8 @@ void msgqueue_put_head(void *msg, msgqueue_t *queue)
 	void **link = (void **)((char *)msg + queue->linkoff);
 
 	pthread_mutex_lock(&queue->put_mutex);
-	while (*queue->get_head)
-	{
-		if (pthread_mutex_trylock(&queue->get_mutex) == 0)
-		{
+	while (*queue->get_head) {
+		if (pthread_mutex_trylock(&queue->get_mutex) == 0) {
 			pthread_mutex_unlock(&queue->put_mutex);
 			*link = *queue->get_head;
 			*queue->get_head = link;
@@ -134,8 +129,7 @@ void *msgqueue_get(msgqueue_t *queue)
 	void *msg;
 
 	pthread_mutex_lock(&queue->get_mutex);
-	if (*queue->get_head || __msgqueue_swap(queue) > 0)
-	{
+	if (*queue->get_head || __msgqueue_swap(queue) > 0) {
 		msg = (char *)*queue->get_head - queue->linkoff;
 		*queue->get_head = *(void **)*queue->get_head;
 	}
@@ -148,24 +142,20 @@ void *msgqueue_get(msgqueue_t *queue)
 
 msgqueue_t *msgqueue_create(size_t maxlen, int linkoff)
 {
-	msgqueue_t *queue = (msgqueue_t *)malloc(sizeof (msgqueue_t));
+	msgqueue_t* queue = (msgqueue_t*) malloc(sizeof (msgqueue_t));
 	int ret;
 
 	if (!queue)
 		return NULL;
 
 	ret = pthread_mutex_init(&queue->get_mutex, NULL);
-	if (ret == 0)
-	{
+	if (ret == 0) {
 		ret = pthread_mutex_init(&queue->put_mutex, NULL);
-		if (ret == 0)
-		{
+		if (ret == 0) {
 			ret = pthread_cond_init(&queue->get_cond, NULL);
-			if (ret == 0)
-			{
+			if (ret == 0) {
 				ret = pthread_cond_init(&queue->put_cond, NULL);
-				if (ret == 0)
-				{
+				if (ret == 0) {
 					queue->msg_max = maxlen;
 					queue->linkoff = linkoff;
 					queue->head1 = NULL;
@@ -177,10 +167,8 @@ msgqueue_t *msgqueue_create(size_t maxlen, int linkoff)
 					queue->nonblock = 0;
 					return queue;
 				}
-
 				pthread_cond_destroy(&queue->get_cond);
 			}
-
 			pthread_mutex_destroy(&queue->put_mutex);
 		}
 
@@ -192,8 +180,7 @@ msgqueue_t *msgqueue_create(size_t maxlen, int linkoff)
 	return NULL;
 }
 
-void msgqueue_destroy(msgqueue_t *queue)
-{
+void msgqueue_destroy(msgqueue_t *queue) {
 	pthread_cond_destroy(&queue->put_cond);
 	pthread_cond_destroy(&queue->get_cond);
 	pthread_mutex_destroy(&queue->put_mutex);

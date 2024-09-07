@@ -16,8 +16,7 @@
   Authors: Wu Jiaxu (wujiaxu@sogou-inc.com)
 */
 
-#ifndef _WFTASKERROR_H_
-#define _WFTASKERROR_H_
+#pragma once
 
 /**
  * @file    WFTaskError.h
@@ -72,4 +71,4 @@ enum
 	WFT_ERR_CONSUL_CHECK_RESPONSE_FAILED = 6002,	///< Consul http code failed
 };
 
-#endif
+

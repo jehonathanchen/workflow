@@ -16,8 +16,7 @@
   Author: Xie Han (xiehan@sogou-inc.com)
 */
 
-#ifndef _MSGQUEUE_H_
-#define _MSGQUEUE_H_
+#pragma once
 
 #include <stddef.h>
 
@@ -34,17 +33,16 @@ extern "C"
  * where spaces of one pointer size should be available for internal usage.
  * 'linkoff' can be positive or negative or zero. */
 
-msgqueue_t *msgqueue_create(size_t maxlen, int linkoff);
-void *msgqueue_get(msgqueue_t *queue);
-void msgqueue_put(void *msg, msgqueue_t *queue);
-void msgqueue_put_head(void *msg, msgqueue_t *queue);
-void msgqueue_set_nonblock(msgqueue_t *queue);
-void msgqueue_set_block(msgqueue_t *queue);
-void msgqueue_destroy(msgqueue_t *queue);
+msgqueue_t* msgqueue_create(size_t maxlen, int linkoff);
+void* msgqueue_get(msgqueue_t* queue);
+void msgqueue_put(void* msg, msgqueue_t* queue);
+void msgqueue_put_head(void* msg, msgqueue_t* queue);
+void msgqueue_set_nonblock(msgqueue_t* queue);
+void msgqueue_set_block(msgqueue_t* queue);
+void msgqueue_destroy(msgqueue_t* queue);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
 
