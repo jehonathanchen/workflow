@@ -1922,11 +1922,7 @@ int Communicator::reply_message_unreliable(struct CommConnEntry *entry)
 			.msg_name		=	entry->target->addr,
 			.msg_namelen	=	entry->target->addrlen,
 			.msg_iov		=	vectors,
-#ifdef __linux__
 			.msg_iovlen		=	(size_t)cnt,
-#else
-			.msg_iovlen		=	cnt,
-#endif
 		};
 		if (sendmsg(entry->sockfd, &message, 0) < 0)
 			return -1;
@@ -2121,8 +2117,6 @@ int Communicator::decrease_handler_thread()
 	return -1;
 }
 
-#ifdef __linux__
-
 void Communicator::shutdown_io_service(IOService *service)
 {
 	pthread_mutex_lock(&service->mutex);
@@ -2172,61 +2166,4 @@ void Communicator::io_unbind(IOService *service)
 		errno = errno_bak;
 	}
 }
-
-#else
-
-void Communicator::shutdown_io_service(IOService *service)
-{
-	pthread_mutex_lock(&service->mutex);
-	close(service->pipe_fd[0]);
-	close(service->pipe_fd[1]);
-	service->pipe_fd[0] = -1;
-	service->pipe_fd[1] = -1;
-	pthread_mutex_unlock(&service->mutex);
-	service->decref();
-}
-
-int Communicator::io_bind(IOService *service)
-{
-	struct poller_data data;
-	int pipe_fd[2];
-
-	if (service->create_pipe_fd(pipe_fd) >= 0)
-	{
-		if (__set_fd_nonblock(pipe_fd[0]) >= 0)
-		{
-			service->ref = 1;
-			data.operation = PD_OP_NOTIFY;
-			data.fd = pipe_fd[0];
-			data.notify = IOService::aio_finish;
-			data.context = service;
-			data.result = NULL;
-			if (mpoller_add(&data, -1, this->mpoller) >= 0)
-			{
-				service->pipe_fd[0] = pipe_fd[0];
-				service->pipe_fd[1] = pipe_fd[1];
-				return 0;
-			}
-		}
-
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-	}
-
-	return -1;
-}
-
-void Communicator::io_unbind(IOService *service)
-{
-	int errno_bak = errno;
-
-	if (mpoller_del(service->pipe_fd[0], this->mpoller) < 0)
-	{
-		/* Error occurred on pipe_fd or Communicator::deinit() called. */
-		this->shutdown_io_service(service);
-		errno = errno_bak;
-	}
-}
-
-#endif
 
